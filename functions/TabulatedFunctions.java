@@ -151,7 +151,7 @@ public class TabulatedFunctions {
     }
 
     //выводим табулированную функцию из байтового потока
-    public static TabulatedFunction inputTabulatedFunction(InputStream in) throws IOException {
+    public static TabulatedFunction inputTabulatedFunction(Class<?> functionClass, InputStream in) throws IOException {
         //создаем поток-обертку
         DataInputStream dataIn = new DataInputStream(in);
         //читаем количество точек функции
@@ -170,7 +170,7 @@ public class TabulatedFunctions {
             points[i] = new FunctionPoint(xValues[i], yValues[i]);
         }
         //создаем и возвращаем табулированную функцию
-        return createTabulatedFunction(points);
+        return createTabulatedFunction(functionClass, points);
     }
 
     //записываем табулированную функцию в символьный поток
@@ -191,7 +191,7 @@ public class TabulatedFunctions {
         writer.flush();
     }
     //читаем табулированную функцию из символьного потока
-    public static TabulatedFunction readTabulatedFunction(Reader in) throws IOException{
+    public static TabulatedFunction readTabulatedFunction(Class<?> functionClass, Reader in) throws IOException{
         //StreamTokenizer для чтения чисел
         StreamTokenizer tokenizer = new StreamTokenizer(in);
         //читаем количество точек
@@ -216,6 +216,6 @@ public class TabulatedFunctions {
         for(int i = 0; i < pointsCount; i++){
             points[i] = new FunctionPoint(xValues[i], yValues[i]);
         }
-        return createTabulatedFunction(points);
+        return createTabulatedFunction(functionClass, points);
     }
 }
