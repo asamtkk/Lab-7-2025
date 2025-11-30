@@ -110,6 +110,55 @@ public class TabulatedFunctions {
         return tabulatedFunc;
     }
 
+    // читаем табулированную функцию из байтового потока с указанием класса через рефлексию
+    public static TabulatedFunction inputTabulatedFunction(Class<?> functionClass, InputStream in) throws IOException {
+        // создаем поток-обертку
+        DataInputStream dataIn = new DataInputStream(in);
+        // читаем количество точек функции
+        int pointsCount = dataIn.readInt();
+        // создаем массивы для хранения координат точек
+        double[] xValues = new double[pointsCount];
+        double[] yValues = new double[pointsCount];
+        // последовательно читаем координаты всех точек из потока
+        for (int i = 0; i < pointsCount; i++) {
+            xValues[i] = dataIn.readDouble();
+            yValues[i] = dataIn.readDouble();
+        }
+        // создаем массив объектов FunctionPoint из прочитанных координат
+        FunctionPoint[] points = new FunctionPoint[pointsCount];
+        for (int i = 0; i < pointsCount; i++) {
+            points[i] = new FunctionPoint(xValues[i], yValues[i]);
+        }
+        // создаем и возвращаем табулированную функцию через рефлексию
+        return createTabulatedFunction(functionClass, points);
+    }
+
+    // читаем табулированную функцию из символьного потока с указанием класса через рефлексию
+    public static TabulatedFunction readTabulatedFunction(Class<?> functionClass, Reader in) throws IOException {
+        // StreamTokenizer для чтения чисел
+        StreamTokenizer tokenizer = new StreamTokenizer(in);
+        // читаем количество точек
+        tokenizer.nextToken(); // переходим к следующему токену (числу)
+        int pointsCount = (int) tokenizer.nval; // читаем числовое значение
+        // создаем массивы для координат
+        double[] xValues = new double[pointsCount];
+        double[] yValues = new double[pointsCount];
+        // читаем координаты всех точек
+        for (int i = 0; i < pointsCount; i++) {
+            tokenizer.nextToken();
+            xValues[i] = tokenizer.nval;
+            tokenizer.nextToken();
+            yValues[i] = tokenizer.nval;
+        }
+        // создаем функцию из массива точек
+        FunctionPoint[] points = new FunctionPoint[pointsCount];
+        for (int i = 0; i < pointsCount; i++) {
+            points[i] = new FunctionPoint(xValues[i], yValues[i]);
+        }
+        // создаем и возвращаем табулированную функцию через рефлексию
+        return createTabulatedFunction(functionClass, points);
+    }
+
     public static TabulatedFunction tabulate(Function function, double leftX, double rightX, int pointsCount) {
         //проверка на количество точек
         if (pointsCount < 2) {
@@ -151,7 +200,7 @@ public class TabulatedFunctions {
     }
 
     //выводим табулированную функцию из байтового потока
-    public static TabulatedFunction inputTabulatedFunction(Class<?> functionClass, InputStream in) throws IOException {
+    public static TabulatedFunction inputTabulatedFunction(InputStream in) throws IOException {
         //создаем поток-обертку
         DataInputStream dataIn = new DataInputStream(in);
         //читаем количество точек функции
@@ -170,7 +219,7 @@ public class TabulatedFunctions {
             points[i] = new FunctionPoint(xValues[i], yValues[i]);
         }
         //создаем и возвращаем табулированную функцию
-        return createTabulatedFunction(functionClass, points);
+        return createTabulatedFunction(points);
     }
 
     //записываем табулированную функцию в символьный поток
@@ -191,7 +240,7 @@ public class TabulatedFunctions {
         writer.flush();
     }
     //читаем табулированную функцию из символьного потока
-    public static TabulatedFunction readTabulatedFunction(Class<?> functionClass, Reader in) throws IOException{
+    public static TabulatedFunction readTabulatedFunction(Reader in) throws IOException{
         //StreamTokenizer для чтения чисел
         StreamTokenizer tokenizer = new StreamTokenizer(in);
         //читаем количество точек
@@ -216,6 +265,6 @@ public class TabulatedFunctions {
         for(int i = 0; i < pointsCount; i++){
             points[i] = new FunctionPoint(xValues[i], yValues[i]);
         }
-        return createTabulatedFunction(functionClass, points);
+        return createTabulatedFunction(points);
     }
 }
